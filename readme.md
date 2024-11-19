@@ -38,7 +38,7 @@ Use `statics` when the operation involves the **entire collection** or the model
 
 #### Example: Static Method for Finding Documents by Age
 
-```plaintext
+```javascript
 studentSchema.statics.findByAge = async function (age) {
   return await this.find({ age });
 };
@@ -53,7 +53,7 @@ Use `methods` when the operation involves **an individual document** or needs to
 
 #### Example: Method to Check if a Student is an Adult
 
-```plaintext
+```javascript
 studentSchema.methods.isAdult = function () {
   return this.age >= 18;
 };
@@ -77,21 +77,21 @@ console.log(student.isAdult()); // true or false
 
 ## Global Error Handler and Unhandled Routes
 
-```plaintext
+```javascript
 // Catch-all for unhandled routes
 app.use((req, res, next) => {
-    const error = new AppError('Route not found', 404);
-    next(error);
+  const error = new AppError('Route not found', 404);
+  next(error);
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status || 500).json({
-        error: {
-            message: err.message || 'Internal Server Error',
-        },
-    });
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: {
+      message: err.message || 'Internal Server Error',
+    },
+  });
 });
 ```
 
