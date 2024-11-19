@@ -30,6 +30,7 @@ Description: This is a postman collection of all the API endpoints.Download this
 
 - [Introduction](#introduction)
 - [Mongoose: Static vs Method](#mongoose-static-vs-method)
+- [Global Error Handler and Unhandled Routes](#global-error-handler-and-unhandled-routes)
 
 ## Introduction
 
@@ -89,3 +90,23 @@ console.log(student.isAdult()); // true or false
 3.  **Is the operation generic to the model or specific to an instance?**
     - **Generic:** Use `statics`.
     - **Specific to an Instance:** Use `methods`.
+
+## Global Error Handler and Unhandled Routes
+
+```plaintext
+// Catch-all for unhandled routes
+app.use((req, res, next) => {
+    const error = new AppError('Route not found', 404);
+    next(error);
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        error: {
+            message: err.message || 'Internal Server Error',
+        },
+    });
+});
+```
