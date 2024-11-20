@@ -96,3 +96,35 @@ app.use((err, req, res, next) => {
 ```
 
 # Part 2 - Branch: `first-project-4`
+
+## Higher Order Function
+
+```javascript
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+
+const catchAsync = (fn: RequestHandler) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch((err) => next(err));
+  };
+};
+
+export default catchAsync ;
+```
+
+The above function `catchAsync` is a higher order function that takes a function as parameter `fn` and returns `fn` if the `fn` returns the Promise or returns the error.
+
+Now we are passing a async request handler as the param of `catchAsync` function
+
+```javascript
+const getSingleStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+  const result = await StudentServices.getSingleStudentFromDB(studentId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student is retrieved succesfully',
+    data: result,
+  });
+});
+```
