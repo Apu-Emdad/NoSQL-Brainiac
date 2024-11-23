@@ -1,7 +1,12 @@
 # NoSQL Brainiac
 
 - [Part 1 - Branch: `first-project-3`](#part-1---branch-first-project-3)
+  - [Introduction](#introduction)
+  - [Mongoose: Static vs Method](#mongoose-static-vs-method)
+  - [Global Error Handler and Unhandled Routes](#global-error-handler-and-unhandled-routes)
 - [Part 2 - Branch: `first-project-4`](#part-2---branch-first-project-4)
+  - [Higher Order Function](#higher-order-function)
+  - [Refactoring Zod validation](#refactoring-zod-validation)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -97,6 +102,11 @@ app.use((err, req, res, next) => {
 
 # Part 2 - Branch: `first-project-4`
 
+## Table of Contents
+
+- [Higher Order Function](#higher-order-function)
+- [Refactoring Zod validation](#refactoring-zod-validation)
+
 ## Higher Order Function
 
 ```javascript
@@ -127,4 +137,102 @@ const getSingleStudent = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+export const StudentControllers = {
+  getAllStudents,
+  getSingleStudent,
+  deleteStudent,
+};
+```
+
+The `getSingleStudent` is used in the below middleware where the returned function from `catchAsync` is invoked:
+
+```javascript
+router.get('/:semesterIdId', StudentControllers.getSingleStudent);
+```
+
+## Refactoring Zod validation
+
+In general we use the zoi validation like:
+
+```javascript
+import { StudentServices } from './student.service';
+import studentValidationSchema from './student.validation';
+
+const createStudent = async (req: Request, res: Response) => {
+  try {
+    const studentData = req.body;
+    const zodParsedData = studentValidationSchema.parse(studentData);
+    const result = await StudentServices.createStudentIntoDB(zodParsedData);
+	/...
+  } catch (err: any) {
+	/...
+  }
+}
+```
+
+We aim to refactor the the `Zod` validation with a middleware, so that we can invoke a single middleware function instead of writing the Schema.Parse multiple times.
+
+First create the `Zod` validation Schema
+
+**student.validation.ts**
+
+```javascript
+export const createStudentValidationSchema = z.object({
+  body: z.object({
+    password: z.string().max(20),
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(['male', 'female', 'other']),
+      //....
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      //....
+    }),
+  }),
+});
+```
+
+Next we have to write the middleware function.
+
+**middlewares\\validateRequest.ts**
+
+```javascript
+import { NextFunction, Request, Response } from 'express';
+import { AnyZodObject } from 'zod';
+const validateRequest = (schema: AnyZodObject) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // validation check
+      //if everything allright next() ->
+      await schema.parseAsync({
+        body: req.body,
+      });
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+};
+export default validateRequest;
+```
+
+Now we can call `validateRequest` any route, before the server execution
+
+```javascript
+router.post(
+  '/create-student',
+  validateRequest(createStudentValidationSchema),
+  UserControllers.createStudent,
+);
+```
+
+or, for another `createAcdemicSemesterValidationSchema` we can reuse the `validateRequest`
+
+```javascript
+router.post(
+  '/create-academic-semester',
+  validateRequest(createAcdemicSemesterValidationSchema),
+  AcademicSemesterControllers.createAcademicSemester,
+);
 ```
