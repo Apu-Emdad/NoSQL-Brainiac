@@ -1,6 +1,9 @@
 # NoSQL Brainiac
 
 - [Part 1 - Branch: `first-project-3`](#part-1---branch-first-project-3)
+  - [Introduction](#introduction)
+  - [Mongoose: Static vs Method](#mongoose-static-vs-method)
+  - [Global Error Handler and Unhandled Routes](#global-error-handler-and-unhandled-routes)
 
 ### Requirement Analysis
 
