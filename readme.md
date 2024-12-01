@@ -7,6 +7,7 @@
 - [Part 2 - Branch: `first-project-4`](#part-2---branch-first-project-4)
   - [Higher Order Function](#higher-order-function)
   - [Refactoring Zod validation](#refactoring-zod-validation)
+  - [Utils vs Middlewares](#utils-vs-middlewares)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -106,6 +107,7 @@ app.use((err, req, res, next) => {
 
 - [Higher Order Function](#higher-order-function)
 - [Refactoring Zod validation](#refactoring-zod-validation)
+- [Utils vs Middlewares](#utils-vs-middlewares)
 
 ## Higher Order Function
 
@@ -236,3 +238,9 @@ router.post(
   AcademicSemesterControllers.createAcademicSemester,
 );
 ```
+
+## Utils vs Middlewares
+
+**Utils:** Utils are the reusable functions used in controllers. The global Util functions will be kept in util folder. And module based util function will be kept in `module_name.utils.ts` file.
+
+**Middlewares:** Middlewares are the function essentially used in http requests. The middleware functions will be kept in `middlewares` folder.
