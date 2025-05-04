@@ -19,7 +19,7 @@ app.use('/api/v1', router);
 
 const test = (req: Request, res: Response) => {
   const a = 10;
-  res.send(a);
+  res.status(200).send({ success: true, result: a }); // Use a valid status code (200)
 };
 
 app.get('/', test);
