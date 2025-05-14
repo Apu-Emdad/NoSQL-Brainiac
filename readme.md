@@ -10,8 +10,8 @@
   - [Utils vs Middlewares](#utils-vs-middlewares)
 - [Part 3 - Branch: `first-project-5`](#part-3---branch-first-project-5)
   - [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
-
-[Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
+  - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
+    [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
 [ER Diagram: 1](./ER_Diagram.png)
 
@@ -253,6 +253,7 @@ router.post(
 ## Table of Contents
 
 - [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
+- [Understanding Zod validation Basic](#understanding-zod-validation-basic)
 
 ## <a id="global-error-and-not-found-handler-simplified-example"></a> Global Error and Not Found Handler (Simplified Example)
 
@@ -293,3 +294,62 @@ app.listen(3000, () => {
 - The `/` route throws an error using `next(error)`.
 - Express skips other middlewares and goes to the error handler.
 - The global error handler sends a `500` status with the error message.
+
+## <a id="understanding-zod-validation-basic"></a> Understanding Zod validation Basic
+
+```javascript
+const createAcdemicSemesterValidationSchema = z.object({
+  body: z.object({
+    name: z.enum([...AcademicSemesterName] as [string, ...string[]]),
+    year: z.string(),
+    code: z.enum([...AcademicSemesterCode] as [string, ...string[]]),
+    startMonth: z.enum([...Months] as [string, ...string[]]),
+    endMonth: z.enum([...Months] as [string, ...string[]]),
+  }),
+});
+```
+
+**1. What if** **`name`** **isn’t passed?**
+
+- Since `name` is **not marked as optional**, it is **required by default**.
+- If omitted, Zod will throw this error:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation Error",
+  "errorDetails": [
+    {
+      "path": ["body", "name"],
+      "message": "Required"
+    }
+  ]
+}
+```
+
+**2. What if** `name` **value is invalid (e.g.,** `"Spring"`**)**
+
+- If name is passed but doesn’t match the enum, Zod will throw:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation Error",
+  "errorDetails": [
+    {
+      "path": ["body", "name"],
+      "message": "Invalid enum value. Expected 'Autumn' | 'Summar' | 'Fall', received 'Spring'"
+    }
+  ]
+}
+```
+
+**Optional Tip:**
+
+```javascript
+name: z.enum([...AcademicSemesterName] as [string, ...string[]], {
+  required_error: 'Semester name is required',
+  invalid_type_error: 'Semester name must be a string',
+})
+
+```
