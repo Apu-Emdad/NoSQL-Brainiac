@@ -9,6 +9,7 @@
   - [Refactoring Zod validation](#refactoring-zod-validation)
   - [Utils vs Middlewares](#utils-vs-middlewares)
 - [Part 3 - Branch: `first-project-5`](#part-3---branch-first-project-5)
+  - [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -248,3 +249,47 @@ router.post(
 **Middlewares:** Middlewares are the function essentially used in http requests. The middleware functions will be kept in `middlewares` folder.
 
 # Part 3 - Branch: `first-project-5`
+
+## Table of Contents
+
+- [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
+
+## <a id="global-error-and-not-found-handler-simplified-example"></a> Global Error and Not Found Handler (Simplified Example)
+
+```javascript
+const express = require('express');
+const app = express();
+
+// Route that throws an error
+app.get('/', (req, res, next) => {
+  const error = new Error('Something went wrong!');
+  next(error);
+});
+
+// Global 404 Not Found Handler (MUST come after all routes)
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Global Error Handler (MUST have 4 params)r
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: err.message });
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+#### How Not Found Handler Works:
+
+- If no route matches the request, Express goes to this middleware.
+- It catches all unknown routes.
+- Sends a `404` status with a `"Route not found"` message.
+
+#### How Error Handler Works:
+
+- The `/` route throws an error using `next(error)`.
+- Express skips other middlewares and goes to the error handler.
+- The global error handler sends a `500` status with the error message.
