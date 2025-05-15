@@ -18,6 +18,8 @@
 
 [ER Diagram: 2](./ER%20Diagram2.png)
 
+[Final](./Final.png)
+
 # Part 1 - Branch: `first-project-3`
 
 ## Table of Contents
