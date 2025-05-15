@@ -9,8 +9,9 @@
   - [Refactoring Zod validation](#refactoring-zod-validation)
   - [Utils vs Middlewares](#utils-vs-middlewares)
 - [Part 3 - Branch: `first-project-5`](#part-3---branch-first-project-5)
-  - [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
+  - [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example)
   - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
+  - [Populate](#populate)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -40,9 +41,9 @@ In Mongoose, **statics** and **methods** serve different purposes despite both b
 
 | **Feature**  | **Statics**                                                                                         | **Methods**                                                                                 |
 | ------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **Context**  | Operates on the **model/class level** (e.g., `Student`).                                            | Operates on the **instance/document level** (e.g., a specific student).                     |
+| **Context**  | Operates on the**model/class level** (e.g., `Student`).                                             | Operates on the**instance/document level** (e.g., a specific student).                      |
 | **Use Case** | For operations that do not require a specific document (e.g., queries, aggregations, or utilities). | For operations related to a specific document (e.g., modifying a property, checking state). |
-| **Access**   | Accessed via the **model** (e.g., `Student.findByAge(age)`).                                        | Accessed via the **instance** (e.g., `studentInstance.isAdult()`).                          |
+| **Access**   | Accessed via the**model** (e.g., `Student.findByAge(age)`).                                         | Accessed via the**instance** (e.g., `studentInstance.isAdult()`).                           |
 
 #### **When to Use** `Statics`
 
@@ -77,15 +78,15 @@ console.log(student.isAdult()); // true or false
 
 #### **Key Decision Criteria**
 
-1.  **Does the function involve one document or many?**
-    - **One Document:** Use a `method`.
-    - **Multiple Documents or the Model Itself:** Use `statics`.
-2.  **Do you need access to instance properties (**`**this**`**) like** `**this.age**` **or** `**this.name**`**?**
-    - **Yes:** Use a `method`.
-    - **No:** Use `statics`.
-3.  **Is the operation generic to the model or specific to an instance?**
-    - **Generic:** Use `statics`.
-    - **Specific to an Instance:** Use `methods`.
+1. **Does the function involve one document or many?**
+   - **One Document:** Use a `method`.
+   - **Multiple Documents or the Model Itself:** Use `statics`.
+2. **Do you need access to instance properties (**`**this**`**) like** `**this.age**` **or** `**this.name**`**?**
+   - **Yes:** Use a `method`.
+   - **No:** Use `statics`.
+3. **Is the operation generic to the model or specific to an instance?**
+   - **Generic:** Use `statics`.
+   - **Specific to an Instance:** Use `methods`.
 
 ## Global Error Handler and Unhandled Routes
 
@@ -255,10 +256,11 @@ router.post(
 
 ## Table of Contents
 
-- [Global Error and Not Found Handler (Simplified Example)](#global-error-and-not-found-handler-simplified-example)
+- [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example))
 - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
+- [Populate](#populate)
 
-## <a id="global-error-and-not-found-handler-simplified-example"></a> Global Error and Not Found Handler (Simplified Example)
+## Global Error and Not Found Handler - Simplified Example
 
 ```javascript
 const express = require('express');
@@ -286,19 +288,18 @@ app.listen(3000, () => {
 });
 ```
 
-#### How Not Found Handler Works:
+**How Not Found Handler Works:**
 
 - If no route matches the request, Express goes to this middleware.
 - It catches all unknown routes.
 - Sends a `404` status with a `"Route not found"` message.
 
-#### How Error Handler Works:
+**How Error Handler Works:**- The `/` route throws an error using `next(error)`.
 
-- The `/` route throws an error using `next(error)`.
 - Express skips other middlewares and goes to the error handler.
 - The global error handler sends a `500` status with the error message.
 
-## <a id="understanding-zod-validation-basic"></a> Understanding Zod validation Basic
+## Understanding Zod validation Basic
 
 ```javascript
 const createAcdemicSemesterValidationSchema = z.object({
@@ -354,5 +355,70 @@ name: z.enum([...AcademicSemesterName] as [string, ...string[]], {
   required_error: 'Semester name is required',
   invalid_type_error: 'Semester name must be a string',
 })
+```
 
+## Populate
+
+In **Mongoose** , the `.populate()` method is used to **automatically replace a referenced ID** in a document with the **actual data** from the related collection.
+
+This is useful when you’re working with **MongoDB references (ObjectId)** and want to fetch related documents without writing separate queries.
+
+**Example:**
+
+Suppose you have two collections:
+
+**Book**
+
+```javascript
+_id: "book123",
+title: "Learn JavaScript",
+author: "author456"  // Reference to Author collection
+}
+```
+
+**Author**
+
+```javascript
+{
+_id: "author456",
+name: "John Doe"
+}
+```
+
+**Mongoose Models:**
+
+```javascript
+const mongoose = require('mongoose');
+
+const authorSchema = new mongoose.Schema({
+  name: String,
+});
+
+const bookSchema = new mongoose.Schema({
+  title: String,
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+});
+
+const Author = mongoose.model('Author', authorSchema);
+const Book = mongoose.model('Book', bookSchema);
+
+const getAllBooks = async () => {
+  const books = await Book.find().populate('author');
+  return books;
+};
+```
+
+**Output (after `.populate()`):**
+
+```javascript
+[
+  {
+    _id: 'book123',
+    title: 'Learn JavaScript',
+    author: {
+      _id: 'author456',
+      name: 'John Doe',
+    },
+  },
+];
 ```
