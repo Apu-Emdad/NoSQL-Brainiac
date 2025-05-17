@@ -72,6 +72,7 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
     new: true,
     runValidators: true,
   });
+
   return result;
 };
 

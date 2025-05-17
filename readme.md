@@ -12,6 +12,8 @@
   - [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example)
   - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
   - [Populate](#populate)
+  - [MongoDB Query Execution Order](#mongodb-query-execution-order)
+  - [Postscript of Part-3](#postscript-of-part-3)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -259,6 +261,8 @@ router.post(
 - [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example))
 - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
 - [Populate](#populate)
+- [MongoDB Query Execution Order](#mongodb-query-execution-order)
+- [Postscript of Part-3](#postscript-of-part-3)
 
 ## Global Error and Not Found Handler - Simplified Example
 
@@ -422,3 +426,82 @@ const getAllBooks = async () => {
   },
 ];
 ```
+
+## MongoDB Query Execution Order
+
+MongoDB executes query operations in a fixed logical order—filtering, sorting, skipping, limiting, and projecting—regardless of the sequence you write them in code.
+
+**Execution Flow**
+
+1. **Filter** : Select documents based on criteria
+2. **Sort** : Order the filtered documents
+3. **Skip** : Skip a specified number of documents
+4. **Limit** : Limit the number of documents returned
+5. **Projection** : Include or exclude specific fields from the result
+
+**Example (How Mongoose Translates)**
+
+```javascript
+await Product.find({ category: 'electronics', inStock: true }, { name: 1, price: 1, _id: 0 })
+  .sort({ price: 1 })
+  .skip(10)
+  .limit(5)
+  .lean();
+```
+
+This Mongoose query translates to the following MongoDB logic:
+
+```javascript
+db.products
+  .find(
+    { category: 'electronics', inStock: true }, // Filter
+    { name: 1, price: 1, _id: 0 }, // Projection
+  )
+  .sort(
+    { price: 1 }, // Sort
+  )
+  .skip(
+    10, // Skip
+  )
+  .limit(
+    5, // Limit
+  );
+```
+
+Even though `.limit()` is written before `.sort()` in some code, **MongoDB always executes sort first, then limit** .
+
+## Postscript of Part-3
+
+- `findOne()` is a shortcut for `find().limit(1)` under the hood.
+- It is **recommended** to use `$set` when updating documents to ensure only the intended fields are modified:
+
+  ```javascript
+  Student.findOneAndUpdate(
+    { id },
+    {
+      $set: {
+        'name.firstName': 'Mezba',
+        'guardian.fatherOccupation': 'Teacher',
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  ```
+
+- Validators do **not** run by default during the following update operations:
+
+  - `Model.updateOne()`
+  - `Model.updateMany()`
+  - `Model.findOneAndUpdate()`
+  - `Model.findByIdAndUpdate()`
+
+  To enable validation in these cases, you must explicitly pass:
+
+  ```javascript
+  {
+    runValidators: true;
+  }
+  ```
