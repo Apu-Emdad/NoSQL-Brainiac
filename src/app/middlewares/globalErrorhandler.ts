@@ -74,8 +74,16 @@ export default globalErrorHandler;
 
 //pattern
 /*
-success
-message
+{
+  success: false,
+  message: ...,
+  errorSources:[
+    path: ...,
+    message:  ...  
+  ]
+  stack: ...
+
+}
 errorSources:[
   path:'',
   message:''

@@ -9,6 +9,23 @@ class QueryBuilder<T> {
     this.query = query;
   }
 
+  /* 
+   // HOW OUR FORMAT SHOULD BE FOR PARTIAL MATCH  : 
+  { email: { $regex : query.searchTerm , $options: i}}
+  { presentAddress: { $regex : query.searchTerm , $options: i}}
+  { 'name.firstName': { $regex : query.searchTerm , $options: i}}
+
+  
+  // WE ARE DYNAMICALLY DOING IT USING LOOP
+   const searchQuery = Student.find({
+     $or: studentSearchableFields.map((field) => ({
+       [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+   });
+  
+  
+  */
+
   search(searchableFields: string[]) {
     const searchTerm = this?.query?.searchTerm;
     if (searchTerm) {
@@ -38,6 +55,17 @@ class QueryBuilder<T> {
     return this;
   }
 
+  /**** 
+    sort by "field" ascending and "test" descending
+    query.sort({ field: 'asc', test: -1 });
+    
+    also possible is to use a array with array key-value pairs
+    query.sort([['field', 'asc']]);
+
+    equivalent
+    query.sort('field -test'); -> here we're using this
+  *****/
+
   sort() {
     const sort =
       (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
@@ -55,6 +83,17 @@ class QueryBuilder<T> {
 
     return this;
   }
+
+  /* 
+  
+  // FIELDS LIMITING FUNCTIONALITY:
+
+  // HOW OUR FORMAT SHOULD BE FOR PARTIAL MATCH 
+
+  fields: 'name,email'; // WE ARE ACCEPTING FROM REQUEST
+  fields: 'name email'; // HOW IT SHOULD BE 
+  
+  */
 
   fields() {
     const fields =

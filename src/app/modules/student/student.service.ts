@@ -10,7 +10,7 @@ import { Student } from './student.model';
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   /*
   const queryObj = { ...query }; // copying req.query object so that we can mutate the copy object 
-   
+   // .../stuednts?searchTerm=rav&email=rav@gmail.com
   let searchTerm = '';   // SET DEFAULT VALUE 
 
   // IF searchTerm  IS GIVEN SET IT
@@ -107,6 +107,8 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   return fieldQuery;
 
   */
+
+  // .../stuednts?searchTerm=rav&email=rav@gmail.com
 
   const studentQuery = new QueryBuilder(
     Student.find()

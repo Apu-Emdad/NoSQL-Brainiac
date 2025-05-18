@@ -15,6 +15,7 @@
   - [MongoDB Query Execution Order](#mongodb-query-execution-order)
   - [Postscript of Part-3](#postscript-of-part-3)
 - [Part 4 - Branch: `first-project-4`](#part-4---branch-first-project-6)
+  - [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -513,3 +514,42 @@ Even though `.limit()` is written before `.sort()` in some code, **MongoDB alway
 # Part 4 - Branch: `first-project-6`
 
 ## Table of Contents
+
+- [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
+
+## `uncaughtException` error and `unhandledRejection`
+
+`uncaughtException` → **Synchronous errors**
+
+- Catches **synchronous** errors that are not caught using `try/catch`.
+- Also catches **async errors thrown outside promises** , like in `setTimeout`.
+
+**Example (Synchronous):**
+
+```javascript
+process.on('uncaughtException', (err) => {
+  console.log('Caught:', err.message);
+});
+
+throw new Error('This is a synchronous uncaught exception');
+```
+
+**Example (Async but not in Promise):**
+
+```javascript
+setTimeout(() => {
+  throw new Error('Still uncaught by promise');
+}, 100);
+```
+
+`unhandledRejection` → **Asynchronous (Promise) errors**
+
+- Catches **asynchronous promise rejections** that are **not handled** with `.catch()` or `try/catch`.
+
+```javascript
+process.on('unhandledRejection', (reason) => {
+  console.log('Caught unhandled rejection:', reason);
+});
+
+Promise.reject('This is an unhandled promise rejection');
+```
