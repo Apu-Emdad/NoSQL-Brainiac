@@ -14,7 +14,7 @@
   - [Populate](#populate)
   - [MongoDB Query Execution Order](#mongodb-query-execution-order)
   - [Postscript of Part-3](#postscript-of-part-3)
-- [Part 4 - Branch: `first-project-4`](#part-4---branch-first-project-6)
+- [Part 4 - Branch: `first-project-6`](#part-4---branch-first-project-6)
   - [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
