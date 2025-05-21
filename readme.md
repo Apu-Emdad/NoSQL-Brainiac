@@ -16,6 +16,7 @@
   - [Postscript of Part-3](#postscript-of-part-3)
 - [Part 4 - Branch: `first-project-6`](#part-4---branch-first-project-6)
   - [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
+  - [`Global QueryBuilder to search, sort, filter, paginate and select`](#global-querybuilder-to-search-sort-filter-paginate-and-select)
 - [Part 5 - Branch: `first-project-7`](#part-5---branch-first-project-7)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
@@ -105,11 +106,9 @@ app.use((req, res, next) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message || 'Internal Server Error',
-    },
-  });
+  res
+    .status(err.status || 500)
+    .json({ error: { message: err.message || 'Internal Server Error' } });
 });
 ```
 
@@ -178,9 +177,9 @@ const createStudent = async (req: Request, res: Response) => {
     const studentData = req.body;
     const zodParsedData = studentValidationSchema.parse(studentData);
     const result = await StudentServices.createStudentIntoDB(zodParsedData);
-	/...
+  /...
   } catch (err: any) {
-	/...
+  /...
   }
 }
 ```
@@ -320,7 +319,7 @@ const createAcdemicSemesterValidationSchema = z.object({
 });
 ```
 
-**1. What if** **`name`** **isn’t passed?**
+**1. What if** **`name`** **isnΓÇÖt passed?**
 
 - Since `name` is **not marked as optional**, it is **required by default**.
 - If omitted, Zod will throw this error:
@@ -329,18 +328,13 @@ const createAcdemicSemesterValidationSchema = z.object({
 {
   "statusCode": 400,
   "message": "Validation Error",
-  "errorDetails": [
-    {
-      "path": ["body", "name"],
-      "message": "Required"
-    }
-  ]
+  "errorDetails": [{ "path": ["body", "name"], "message": "Required" }]
 }
 ```
 
 **2. What if** `name` **value is invalid (e.g.,** `"Spring"`**)**
 
-- If name is passed but doesn’t match the enum, Zod will throw:
+- If name is passed but doesnΓÇÖt match the enum, Zod will throw:
 
 ```json
 {
@@ -368,7 +362,7 @@ name: z.enum([...AcademicSemesterName] as [string, ...string[]], {
 
 In **Mongoose** , the `.populate()` method is used to **automatically replace a referenced ID** in a document with the **actual data** from the related collection.
 
-This is useful when you’re working with **MongoDB references (ObjectId)** and want to fetch related documents without writing separate queries.
+This is useful when youΓÇÖre working with **MongoDB references (ObjectId)** and want to fetch related documents without writing separate queries.
 
 **Example:**
 
@@ -397,9 +391,7 @@ name: "John Doe"
 ```javascript
 const mongoose = require('mongoose');
 
-const authorSchema = new mongoose.Schema({
-  name: String,
-});
+const authorSchema = new mongoose.Schema({ name: String });
 
 const bookSchema = new mongoose.Schema({
   title: String,
@@ -422,17 +414,14 @@ const getAllBooks = async () => {
   {
     _id: 'book123',
     title: 'Learn JavaScript',
-    author: {
-      _id: 'author456',
-      name: 'John Doe',
-    },
+    author: { _id: 'author456', name: 'John Doe' },
   },
 ];
 ```
 
 ## MongoDB Query Execution Order
 
-MongoDB executes query operations in a fixed logical order—filtering, sorting, skipping, limiting, and projecting—regardless of the sequence you write them in code.
+MongoDB executes query operations in a fixed logical orderΓÇöfiltering, sorting, skipping, limiting, and projectingΓÇöregardless of the sequence you write them in code.
 
 **Execution Flow**
 
@@ -490,10 +479,7 @@ Even though `.limit()` is written before `.sort()` in some code, **MongoDB alway
         'guardian.fatherOccupation': 'Teacher',
       },
     },
-    {
-      new: true,
-      runValidators: true,
-    },
+    { new: true, runValidators: true },
   );
   ```
 
@@ -517,10 +503,11 @@ Even though `.limit()` is written before `.sort()` in some code, **MongoDB alway
 ## Table of Contents
 
 - [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
+- [`Global QueryBuilder to search, sort, filter, paginate and select`](#global-querybuilder-to-search-sort-filter-paginate-and-select)
 
 ## `uncaughtException` error and `unhandledRejection`
 
-`uncaughtException` → **Synchronous errors**
+`uncaughtException` ΓåÆ **Synchronous errors**
 
 - Catches **synchronous** errors that are not caught using `try/catch`.
 - Also catches **async errors thrown outside promises** , like in `setTimeout`.
@@ -543,7 +530,7 @@ setTimeout(() => {
 }, 100);
 ```
 
-`unhandledRejection` → **Asynchronous (Promise) errors**
+`unhandledRejection` ΓåÆ **Asynchronous (Promise) errors**
 
 - Catches **asynchronous promise rejections** that are **not handled** with `.catch()` or `try/catch`.
 
@@ -553,6 +540,236 @@ process.on('unhandledRejection', (reason) => {
 });
 
 Promise.reject('This is an unhandled promise rejection');
+```
+
+## Global QueryBuilder to search, sort, filter, paginate and select
+
+```javascript
+import { FilterQuery, Query } from 'mongoose';
+
+class QueryBuilder<T> {
+  public modelQuery: Query<T[], T>;
+  public query: Record<string, unknown>;
+
+  constructor(modelQuery: Query<T[], T>, query: Record<string, unknown>) {
+    this.modelQuery = modelQuery;
+    this.query = query;
+  }
+
+
+  search(searchableFields: string[]) {
+    const searchTerm = this?.query?.searchTerm;
+    if (searchTerm) {
+      this.modelQuery = this.modelQuery.find({
+        $or: searchableFields.map(
+          (field) =>
+            ({
+              [field]: { $regex: searchTerm, $options: 'i' },
+            }) as FilterQuery<T>,
+        ),
+      });
+    }
+
+    return this;
+  }
+
+  filter() {
+    const queryObj = { ...this.query }; // copy
+
+    // Filtering
+    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+
+    excludeFields.forEach((el) => delete queryObj[el]);
+
+    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+
+    return this;
+  }
+
+
+
+  sort() {
+    const sort =
+      (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
+    this.modelQuery = this.modelQuery.sort(sort as string);
+
+    return this;
+  }
+
+  paginate() {
+    const page = Number(this?.query?.page) || 1;
+    const limit = Number(this?.query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+
+    return this;
+  }
+
+
+
+  fields() {
+    const fields =
+      (this?.query?.fields as string)?.split(',')?.join(' ') || '-__v';
+
+    this.modelQuery = this.modelQuery.select(fields);
+    return this;
+  }
+}
+
+export default QueryBuilder;
+```
+
+**Example Query:**
+
+```javascript
+/students?searchTerm=john&age=23&sort=name.firstName,-age&page=2&limit=5&fields=name,email
+
+//the query returns
+this.query = {
+  searchTerm: 'john', // serach
+  age: '23', //filter
+  sort: 'name.firstName,-age', //sort
+  page: '2',
+  limit: '5',
+  fields: 'name,email' //select
+};
+```
+
+`search` **method**
+
+```javascript
+search(searchableFields: string[]) {
+  const searchTerm = this?.query?.searchTerm;
+  if (searchTerm) {
+    this.modelQuery = this.modelQuery.find({
+      $or: searchableFields.map(
+        (field) =>
+          ({
+            [field]: { $regex: searchTerm, $options: 'i' },
+          }) as FilterQuery<T>,
+      ),
+    });
+  }
+
+  return this;
+}
+```
+
+Generated query fragment:
+
+```javascript
+{
+  $or: [
+    { email: { $regex: 'john', $options: 'i' } },
+    { 'name.firstName': { $regex: 'john', $options: 'i' } },
+    { presentAddress: { $regex: 'john', $options: 'i' } },
+  ];
+}
+```
+
+`filter ` **method**
+
+```javascript
+filter() {
+  const queryObj = { ...this.query };
+  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+  excludeFields.forEach((el) => delete queryObj[el]);
+  this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+  return this;
+}
+
+```
+
+Generated query fragment (after excluding searchTerm, sort, etc.):
+
+```javascript
+{
+  age: '23';
+}
+```
+
+`sort  ` **method**
+
+```javascript
+sort() {
+  const sort =
+    (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
+  this.modelQuery = this.modelQuery.sort(sort as string);
+  return this;
+}
+
+```
+
+Generated query fragment:
+
+```javascript
+.sort('name.firstName -age')
+
+```
+
+`paginate` **method**
+
+```javascript
+paginate() {
+  const page = Number(this?.query?.page) || 1;
+  const limit = Number(this?.query?.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+  return this;
+}
+
+```
+
+Generated query fragment:
+
+```javascript
+.skip(5).limit(5)
+// page = 2, limit = 5 → skip = (2 - 1) * 5 = 5
+
+```
+
+`fields ` **method**
+
+```javascript
+fields() {
+  const fields =
+    (this?.query?.fields as string)?.split(',')?.join(' ') || '-__v';
+  this.modelQuery = this.modelQuery.select(fields);
+  return this;
+}
+
+
+```
+
+Generated query fragment:
+
+```javascript
+.select('name email')
+
+```
+
+**Combined Final Query:**
+
+```javascript
+Student.find({
+  $or: [
+    { email: { $regex: 'john', $options: 'i' } },
+    { 'name.firstName': { $regex: 'john', $options: 'i' } },
+    { presentAddress: { $regex: 'john', $options: 'i' } },
+  ],
+  age: '23',
+})
+  .sort('name.firstName -age')
+  .skip(5)
+  .limit(5)
+  .select('name email')
+  .populate('admissionSemester')
+  .populate({
+    path: 'academicDepartment',
+    populate: { path: 'academicFaculty' },
+  });
 ```
 
 ## Part 5 - Branch: `first-project-7`
