@@ -7,7 +7,7 @@
 - [Part 2 - Branch: `first-project-4`](#part-2---branch-first-project-4)
   - [Higher Order Function](#higher-order-function)
   - [Refactoring Zod validation](#refactoring-zod-validation)
-  - [Utils vs Middlewares](#utils-vs-middlewares)
+  - [Utils vs Middlewares\*\*\*\*](#utils-vs-middlewares)
 - [Part 3 - Branch: `first-project-5`](#part-3---branch-first-project-5)
   - [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example)
   - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
@@ -18,14 +18,17 @@
   - [`uncaughtException` error and `unhandledRejection`](#uncaughtexception-error-and-unhandledrejection)
   - [`Global QueryBuilder to search, sort, filter, paginate and select`](#global-querybuilder-to-search-sort-filter-paginate-and-select)
 - [Part 5 - Branch: `first-project-7`](#part-5---branch-first-project-7)
+  - [`$pull` and `$in` in MongoDB](#pull-and-in-in-mongodb)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
-[ER Diagram: basic](./ER_Diagram.png)
-
-[ER Diagram: Final](./ER%20Diagram2.png)
+[ER Diagram: basic](./Final.png)
 
 ![Final](./Final.png)
+
+[ER Diagram: Detailed](./erdiagram.png)
+
+![ER Diagram: Detailed](./erdiagram.png)
 
 # Part 1 - Branch: `first-project-3`
 
@@ -775,3 +778,171 @@ Student.find({
 ## Part 5 - Branch: `first-project-7`
 
 ## Table of Contents
+
+- [`$pull` and `$in` in MongoDB](#pull-and-in-in-mongodb)
+- [`$addToSet` and `$each` in MongoDB](#addtoset-and-each-in-mongodb)
+
+## `$pull` and `$in` in MongoDB
+
+`$pull`
+The `$pull` operator in **MongoDB** is a powerful update operator used to remove all instances of a specified value or values from an **array**. This operator is particularly useful for modifying arrays within documents without retrieving and updating the entire array manually.
+
+**MongoDB $pull Operator**
+
+- `$pull` **operator** in [**MongoDB**](https://www.geeksforgeeks.org/mongodb-tutorial/) is used to remove all instances of a specified value or values from an array within a document.
+- It can also be used for nested arrays, making it a versatile tool.
+- If the **$pull operator** is unable to find the desired value, it returns the original array and makes no changes to it
+
+**Syntax**
+
+```javascript
+{ $pull: { \<field1>: \<value|condition>, \<field2>: \<value|condition>, ... } }
+```
+
+**Examples of $pull Operator**
+
+```
+{
+  "_id": 1,
+  "name": "Alice",
+  "skills": ["JavaScript", "Python", "Java"]
+},
+{
+  "_id": 2,
+  "name": "Bob",
+  "skills": ["JavaScript", "Java", "C++"]
+},
+{
+  "_id": 3,
+  "name": "Charlie",
+  "skills": ["Python", "Ruby", "JavaScript"]
+}
+```
+
+Example: Removing a Specific Skill
+
+Let's Remove the skill "Java" from all contributors who have it.
+
+```
+db.contributor.updateMany(
+  { skills: "Java" },
+  { $pull: { skills: "Java" } }
+)
+```
+
+\***\*Output:\*\***
+
+```
+{
+  "_id": 1,
+  "name": "Alice",
+  "skills": ["JavaScript", "Python"]
+},
+{
+  "_id": 2,
+  "name": "Bob",
+  "skills": ["JavaScript", "C++"]
+},
+{
+  "_id": 3,
+  "name": "Charlie",
+  "skills": ["Python", "Ruby", "JavaScript"]
+}
+```
+
+**`$in` operator:**
+
+**Example Document:**
+
+```javascript
+[
+  { _id: 1, name: 'Apple' },
+  { _id: 2, name: 'Banana' },
+  { _id: 3, name: 'Cherry' },
+  { _id: 4, name: 'Date' },
+];
+```
+
+Query Using `$in`
+
+```javascript
+db.fruits.find({
+  name: { $in: ['Apple', 'Cherry'] },
+});
+```
+
+**What It Does:**
+
+This finds all documents where the `name` field is either `"Apple"` **or** `"Cherry"`.
+
+Output:
+
+```javascript
+[
+  { _id: 1, name: 'Apple' },
+  { _id: 3, name: 'Cherry' },
+];
+```
+
+## `$addToSet` and `$each` in MongoDB
+
+`$addToSet`
+
+The [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) operator adds a value to an array unless the value is already present, in which case [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) does nothing to that array.
+
+**Examples**
+
+Create the `inventory` collection:
+
+```javascript
+db.inventory.insertOne({
+  _id: 1,
+  item: 'polarizing_filter',
+  tags: ['electronics', 'camera'],
+});
+```
+
+The following operation adds the element `"accessories"` to the `tags` array since `"accessories"` does not exist in the array:
+
+```javascript
+db.inventory.updateOne({ _id: 1 }, { $addToSet: { tags: 'accessories' } });
+```
+
+Resulting Document:
+
+```javascript
+{
+  "_id": 1,
+  "item": "polarizing_filter",
+  "tags": ["electronics", "camera", "accessories"]
+}
+```
+
+`$each` Modifier
+
+```javascript
+db.inventory.insertOne({
+  _id: 1,
+  item: 'polarizing_filter',
+  tags: ['electronics'],
+});
+```
+
+Then the following operation uses the [`$addToSet`](https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#mongodb-update-up.-addToSet) operator with the [`$each`](https://www.mongodb.com/docs/manual/reference/operator/update/each/#mongodb-update-up.-each) modifier to add multiple elements to the `tags` array:
+
+```javascript
+db.inventory.updateOne(
+  { _id: 2 },
+  { $addToSet: { tags: { $each: ['camera', 'electronics', 'accessories'] } } },
+);
+```
+
+Resulting Document:
+
+```javascript
+{
+  "_id": 1,
+  "item": "polarizing_filter",
+  "tags": ["electronics", "camera", "accessories"]
+}
+```
