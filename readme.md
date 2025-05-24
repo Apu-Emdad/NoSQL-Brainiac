@@ -7,7 +7,7 @@
 - [Part 2 - Branch: `first-project-4`](#part-2---branch-first-project-4)
   - [Higher Order Function](#higher-order-function)
   - [Refactoring Zod validation](#refactoring-zod-validation)
-  - [Utils vs Middlewares\*\*\*\*](#utils-vs-middlewares)
+  - [Utils vs Middlewares](#utils-vs-middlewares)
 - [Part 3 - Branch: `first-project-5`](#part-3---branch-first-project-5)
   - [Global Error and Not Found Handler - Simplified Example)](#global-error-and-not-found-handler---simplified-example)
   - [Understanding Zod validation Basic](#understanding-zod-validation-basic)
@@ -92,7 +92,7 @@ console.log(student.isAdult()); // true or false
 1. **Does the function involve one document or many?**
    - **One Document:** Use a `method`.
    - **Multiple Documents or the Model Itself:** Use `statics`.
-2. **Do you need access to instance properties (**`**this**`**) like** `**this.age**` **or** `**this.name**`**?**
+2. **Do you need access to instance properties (**`this`**) like** `this.age` **or** `this.name`**?**
    - **Yes:** Use a `method`.
    - **No:** Use `statics`.
 3. **Is the operation generic to the model or specific to an instance?**
@@ -324,7 +324,7 @@ const createAcdemicSemesterValidationSchema = z.object({
 });
 ```
 
-**1. What if** **`name`** **isnΓÇÖt passed?**
+**1. What if** **`name`** is not passed?
 
 - Since `name` is **not marked as optional**, it is **required by default**.
 - If omitted, Zod will throw this error:
