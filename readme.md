@@ -19,6 +19,7 @@
   - [`Global QueryBuilder to search, sort, filter, paginate and select`](#global-querybuilder-to-search-sort-filter-paginate-and-select)
 - [Part 5 - Branch: `first-project-7`](#part-5---branch-first-project-7)
   - [`$pull` and `$in` in MongoDB](#pull-and-in-in-mongodb)
+  - [`$addToSet` and `$each` in MongoDB](#addtoset-and-each-in-mongodb)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
