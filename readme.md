@@ -21,7 +21,7 @@
   - [`$pull` and `$in` in MongoDB](#pull-and-in-in-mongodb)
   - [`$addToSet` and `$each` in MongoDB](#addtoset-and-each-in-mongodb)
 - [Part 6 - Branch: `first-project-8`](#part-6---branch-first-project-8)
-- [Part 7 - Branch: `first-project-9``](#part-7---branch-first-project-9)
+- [Part 7 - Branch: `first-project-9`](#part-7---branch-first-project-9)
   - [Authentication vs Authorization](#authentication-vs-authorization)
   - [Create random byte by Node Shell](#create-random-byte-by-node-shell)
   - [Cookie, Access Token and Refresh Token](#cookie-access-token-and-refresh-token)
