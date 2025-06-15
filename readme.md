@@ -24,6 +24,7 @@
 - [Part 7 - Branch: `first-project-9``](#part-7---branch-first-project-9)
   - [Authentication vs Authorization](#authentication-vs-authorization)
   - [Create random byte by Node Shell](#create-random-byte-by-node-shell)
+  - [Cookie, Access Token and Refresh Token](#cookie-access-token-and-refresh-token)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
