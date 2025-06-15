@@ -1026,21 +1026,21 @@ It'll generate&#x20;
 
 ## Cookie, Access Token and Refresh Token
 
-**Cookie**
+**Cookie:**
 A small piece of data stored by the browser, sent back with every request to the server. It helps the server remember information about the client, like login status.
 
 - When you visit a website, the server can give your browser a cookie.
 - Your browser stores it and automatically sends it back to the server every time you visit that site again.
 - Cookies are often used to **remember you**, like keeping you logged in or storing preferences.
 
-**Access Token**
+**Access Token:**
 A short-lived token sent by the server to the client after login. The client uses it to prove authentication when making API requests. It usually expires quickly for security reasons.
 
 - When you log in, the server gives you this token.
 - You send it with every request to protected routes (like “get user profile” or “update post”).
 - It usually **expires quickly** (like in 15 minutes) for security.
 
-**Refresh Token**
+**Refresh Token:**
 A longer-lived token stored safely (usually in a cookie with `httpOnly`) used to get a new access token when the old one expires. It helps keep the user logged in without asking for credentials repeatedly.
 
 - It’s **longer-lasting** than the access token.
