@@ -1048,6 +1048,27 @@ A longer-lived token stored safely (usually in a cookie with `httpOnly`) used to
 - It’s stored securely in a cookie (usually `httpOnly`).
 - When your access token expires, your app sends the refresh token to the server to **get a new access token without logging in again**.
 
+### Why Is the Refresh Token Saved in a Cookie?
+
+The refresh token is saved in a cookie—specifically an HTTP-only cookie—to enhance security and protect against XSS (Cross-Site Scripting) attacks.
+
+Here’s why:
+
+- **HTTP-only flag**
+  When a cookie is set with httpOnly: true, it cannot be accessed by JavaScript running in the browser (e.g., document.cookie).
+  This prevents attackers from stealing the refresh token even if they manage to inject malicious scripts.
+
+- **Automatically sent with requests**
+  Cookies are automatically included in HTTP requests by the browser—no need to manually attach the refresh token on the frontend.
+  This makes the refresh flow seamless and consistent.
+
+- **Reduces surface area for attacks**
+  If you store the refresh token in localStorage or sessionStorage, it's accessible to JavaScript—making it easier for XSS attacks to extract it.
+  Cookies (with proper flags like httpOnly, secure, and sameSite) reduce that risk.
+
+- **Built-in browser handling**
+  The browser takes care of sending the cookie only to the origin you specify (sameSite, domain, path), giving you finer control over exposure.
+
 ### **Example Setup**
 
 **src\app.ts**
