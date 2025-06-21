@@ -26,6 +26,7 @@
   - [Create random byte by Node Shell](#create-random-byte-by-node-shell)
   - [Cookie, Access Token and Refresh Token](#cookie-access-token-and-refresh-token)
 - [Part 8 - Branch: `first-project-10`](#part-8---branch-first-project-10)
+  - [Common Content-Types and `req.body` type](#common-content-types-and-reqbody-type)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -1221,3 +1222,16 @@ const refreshToken = catchAsync(async (req, res) => {
 Cookies store the refresh token securely. The frontend uses the access token for requests. When access token expires, frontend calls `/refresh-token` endpoint, sending the refresh token automatically via cookie, and gets a new access token without asking the user to log in again.
 
 # Part 8 - Branch: `first-project-10`
+
+## Table of Contents
+
+- [Common Content-Types and `req.body` type](#common-content-types-and-reqbody-type)
+
+## Common Content-Types and `req.body` type
+
+| Content-Type                      | Description                                                                                                          | Example Request Body                    | `req.body` Type in Express                                                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| application/json                  | JSON data sent as raw string                                                                                         | { "name": "John", "age": 30 }           | Parsed JS object, e.g. `{ name: 'John', age: 30 }` (via `express.json()` middleware)                                                                                                        |
+| application/x-www-form-urlencoded | URL-encoded form data, typical for HTML forms. Takes data from request url. example: `submit/name=John%20Doe&age=30` | name=John\&age=30                       | Parsed JS object, e.g. `{ name: 'John', age: '30' }` (via `express.urlencoded() `middleware)                                                                                                |
+| multipart/form-data               | Used for file uploads or mixed data (files + fields)                                                                 | Form data including files + text fields | Parsed object with only text fields in req.body as strings; files in `req.file` or `req.files` (when using middleware like `multer`). Without middleware, `req.body` is undefined or empty. |
+| text/plain                        | Plain text content                                                                                                   | Just some plain text                    | String (if using custom middleware), otherwise usually undefined                                                                                                                            |
