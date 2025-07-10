@@ -1241,3 +1241,45 @@ Cookies store the refresh token securely. The frontend uses the access token for
 # Part 9 - Branch: `first-project-11`
 
 # Part 10 - Branch: `first-project-12`
+
+## Table of Contents
+
+- [What is DB seed?](#what-is-db-seed)
+
+## What is DB seed?
+
+Database Seeding is the process of populating a database with initial or sample data, typically used in development or testing environments. It is usually performed automatically when the application starts, ensuring the database has the necessary default data such as users, settings, or sample records. In production, seeding may also be used during deployment to insert essential data required for the application to function correctly.
+
+**Example:**
+
+```tsx
+const seedSuperAdmin = async () => {
+  //when database is connected, we will check is there any user who is super admin
+  const isSuperAdminExits = await User.findOne({ role: USER_ROLE.superAdmin });
+
+  if (!isSuperAdminExits) {
+    await User.create(superUser);
+  }
+};
+```
+
+**server.ts**
+
+```tsx
+async function main() {
+  try {
+    await mongoose.connect(config.database_url as string);
+
+    seedSuperAdmin();
+    server = app.listen(config.port, () => {
+      console.log(`app is listening on port ${config.port}`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+main();
+
+});
+```
