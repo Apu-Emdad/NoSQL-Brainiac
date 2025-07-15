@@ -29,6 +29,7 @@
   - [Common Content-Types and `req.body` type](#common-content-types-and-reqbody-type)
 - [Part 9 - Branch: `first-project-11`](#part-9---branch-first-project-11)
 - [Part 10 - Branch: `first-project-12`](#part-10---branch-first-project-12)
+- [Testing Guideline](#testing-guideline)
 
 [Requiremnet-Analysis](https://docs.google.com/document/d/10mkjS8boCQzW4xpsESyzwCCLJcM3hvLghyD_TeXPBx0/edit?usp=sharing)
 
@@ -1269,7 +1270,7 @@ const seedSuperAdmin = async () => {
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
-
+    //seeding super admin
     seedSuperAdmin();
     server = app.listen(config.port, () => {
       console.log(`app is listening on port ${config.port}`);
@@ -1280,6 +1281,16 @@ async function main() {
 }
 
 main();
-
-});
 ```
+
+# Testing Guideline
+
+- Create Super Admin. Extend the access token `JWT_ACCESS_EXPIRES_IN` for testing purpose. Save the token as a variable in postman.
+- Create Academic Faculty, Academic Department and Academic Semester
+- Create acdemicFaculty, academicDepartment field into Faculty and create faculties
+- Create Student
+- Create Admin, Save the access token as a variable in postman for testing purpose
+- Follow Requirement analysis to add course. Add Course using admin credential. While adding the course, first add a course without dependency. And add a second course that will take first course as a prerequisite course.
+- Create courses that require more prerequisite course
+- To offer a course you need a registered semester i.e. OffereCourse needs SemesterRegistration.
+- Create SemesterRegistration, Update the SemesterRegistration to "ONGOING" from "UPCOMING"
