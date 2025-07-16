@@ -1292,5 +1292,10 @@ main();
 - Create Admin, Save the access token as a variable in postman for testing purpose
 - Follow Requirement analysis to add course. Add Course using admin credential. While adding the course, first add a course without dependency. And add a second course that will take first course as a prerequisite course.
 - Create courses that require more prerequisite course
+- Create faculties(CourseFaculty) for courses (route: `/:courseId/assign-faculties`)
+- Get faculties for courses (route: `/:courseId/assign-faculties`)
 - To offer a course you need a registered semester i.e. OffereCourse needs SemesterRegistration.
 - Create SemesterRegistration, Update the SemesterRegistration to "ONGOING" from "UPCOMING"
+- Create offeredCourse. While creating offeredCourse make sure you're assigning faculties to related course
+- Create EnrolledCourse using student's token. So the student is enrolled into the course
+- Get My offered courses from route - `/my-offered-courses` using student's toke. Students will not get offered courses, if he hasn't completed any related prerequisite course.
